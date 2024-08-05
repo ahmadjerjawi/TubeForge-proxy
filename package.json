@@ -1,0 +1,11 @@
+{
+  "name": "Tubeforge",
+  "version": "1.0.0",
+  "main": "api/proxy.js",
+  "scripts": {
+    "start": "node proxy.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
+}
