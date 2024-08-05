@@ -1,11 +1,8 @@
 # TubeForge-proxy
-this is a proxy made for Tube Forge is a youtube client revival some devices cannot connect to the api so we should add proxy for them i could made you need to provide your own proxy but i have free time i can help the ones for the broke
-# Project Name
 
 ## Overview
-
-Briefly describe your project here. What does it do? What technologies does it use?
-
+this is a proxy made for Tube Forge is a youtube client revival some devices cannot connect to the api so we should add proxy for them i could made you need to provide your own proxy but i have free time i can help the ones for the broke
+So this a project made to proxy or redirect your request from invidious insteance api to it because the public instances use https you could use your own instance and i would recommend so if not you can use this proxy
 ## Prerequisites
 
 Before you start, ensure you have the following installed:
