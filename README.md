@@ -1,5 +1,5 @@
 # TubeForge-proxy
-this is a proxy made for Tube Forge is a youtube client revival some devices cannot connect to the api so we should add proxy for them 
+this is a proxy made for Tube Forge is a youtube client revival some devices cannot connect to the api so we should add proxy for them i could made you need to provide your own proxy but i have free time i can help the ones for the broke
 # Project Name
 
 ## Overview
