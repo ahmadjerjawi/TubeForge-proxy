@@ -1,11 +1,14 @@
 {
-  "name": "Tubeforge",
+  "name": "TubeForge",
   "version": "1.0.0",
-  "main": "api/proxy.js",
+  "description": "A simple proxy server for my youtube client api",
+  "main": "proxy.js",
   "scripts": {
     "start": "node proxy.js"
   },
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^1.7.3",
+    "cheerio": "^1.0.0-rc.10",
+    "express": "^4.17.1"
   }
 }
