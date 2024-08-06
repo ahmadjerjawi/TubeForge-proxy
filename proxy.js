@@ -15,9 +15,9 @@ function rewriteUrls(content, baseUrl, contentType) {
 
             const fixUrl = (url) => {
                 if (url && !/^https?:\/\//i.test(url)) {
-                    return new URL(url, baseUrl).href;
+                    return new URL(url, baseUrl).href.replace(/^https?:\/\//, '/');
                 }
-                return url;
+                return url.replace(/^https?:\/\//, '/');
             };
 
             if (srcAttr) {
@@ -30,14 +30,19 @@ function rewriteUrls(content, baseUrl, contentType) {
                 $(element).attr('action', fixUrl(actionAttr));
             }
         });
+
+        // Handle favicon
+        if (!$('link[rel="icon"]').length) {
+            $('head').append(`<link rel="icon" href="${baseUrl}/favicon.ico">`);
+        }
+
         return $.html();
     } else if (contentType && contentType.includes('application/javascript')) {
-        // For JavaScript content, replace URLs directly
         let updatedContent = content.toString('utf8');
-        const baseUrl = new URL(baseUrl).origin;
+        const baseUrl = new URL(baseUrl).origin.replace(/^https?:\/\//, '/');
         updatedContent = updatedContent.replace(/(src|href|url)\s*=\s*['"]([^'"]+)['"]/g, (match, p1, p2) => {
             if (!/^https?:\/\//i.test(p2)) {
-                const fixedUrl = new URL(p2, baseUrl).href;
+                const fixedUrl = new URL(p2, baseUrl).href.replace(/^https?:\/\//, '/');
                 return `${p1}="${fixedUrl}"`;
             }
             return match;
@@ -48,8 +53,13 @@ function rewriteUrls(content, baseUrl, contentType) {
 }
 
 async function proxyHandler(req, res) {
+    const targetUrl = req.url.slice(1);
+    if (!targetUrl) {
+        res.status(400).send({ error: 'Cannot get without URL' });
+        return;
+    }
+
     try {
-        const targetUrl = req.url.slice(1);
         const decodedUrl = decodeURIComponent(targetUrl);
 
         let finalUrl;
@@ -99,7 +109,6 @@ async function proxyHandler(req, res) {
         if (contentType && (contentType.includes('text/html') || contentType.includes('application/javascript'))) {
             let content = response.data;
 
-            // Set the response content encoding if it's not already set
             if (encoding) {
                 res.set('Content-Encoding', encoding);
             }
@@ -122,9 +131,14 @@ async function proxyHandler(req, res) {
             res.status(502).send({ error: 'Bad Gateway' });
         } else {
             console.error('Request setup error');
-            res.status(500).send({ error: 'Internal Server Error' });
+            res.status(400).send({ error: 'Internal Server Error' });
         }
     }
 }
 
 app.all('/*', proxyHandler);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
