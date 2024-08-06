@@ -131,7 +131,7 @@ async function proxyHandler(req, res) {
             res.status(502).send({ error: 'Bad Gateway' });
         } else {
             console.error('Request setup error');
-            res.status(400).send({ error: 'Internal Server Error' });
+            res.status(400).send({ error: 'Cannot get without URL' });
         }
     }
 }
