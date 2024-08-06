@@ -1,7 +1,6 @@
 const axios = require('axios');
 const express = require('express');
 const cheerio = require('cheerio');
-const zlib = require('zlib');
 const app = express();
 
 app.use(express.json());
@@ -95,13 +94,14 @@ async function proxyHandler(req, res) {
         }
 
         const contentType = response.headers['content-type'];
+        const encoding = response.headers['content-encoding'];
 
         if (contentType && (contentType.includes('text/html') || contentType.includes('application/javascript'))) {
-            const encoding = response.headers['content-encoding'];
             let content = response.data;
 
-            if (encoding && encoding.includes('gzip')) {
-                content = zlib.gunzipSync(response.data);
+            // Set the response content encoding if it's not already set
+            if (encoding) {
+                res.set('Content-Encoding', encoding);
             }
 
             const baseUrl = `https://${new URL(finalUrl).host}`;
