@@ -53,30 +53,27 @@ function rewriteUrls(content, baseUrl, contentType) {
 }
 
 async function proxyHandler(req, res) {
-    const targetUrl = req.url.slice(1);
+    let targetUrl = req.url.slice(1);
     if (!targetUrl) {
         res.status(400).send({ error: 'Cannot get without URL' });
         return;
     }
 
     try {
-        const decodedUrl = decodeURIComponent(targetUrl);
-
-        let finalUrl;
-        if (/^https?:\/\//i.test(decodedUrl)) {
-            finalUrl = decodedUrl;
-        } else {
-            finalUrl = `https://${decodedUrl}`;
+        // Decode the URL and add https if it doesn't start with http or https
+        targetUrl = decodeURIComponent(targetUrl);
+        if (!/^https?:\/\//i.test(targetUrl)) {
+            targetUrl = `https://${targetUrl}`;
         }
 
-        console.log(`Proxying request to: ${finalUrl}`);
+        console.log(`Proxying request to: ${targetUrl}`);
 
         const response = await axios({
             method: req.method,
-            url: finalUrl,
+            url: targetUrl,
             headers: {
                 ...req.headers,
-                host: new URL(finalUrl).host,
+                host: new URL(targetUrl).host,
                 'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 (compatible; ProxyServer/1.0)'
             },
             data: req.method === 'POST' ? req.body : undefined,
@@ -95,7 +92,7 @@ async function proxyHandler(req, res) {
         if (response.status === 302 || response.status === 301) {
             const redirectUrl = response.headers.location;
             if (redirectUrl) {
-                const absoluteRedirectUrl = new URL(redirectUrl, finalUrl).toString();
+                const absoluteRedirectUrl = new URL(redirectUrl, targetUrl).toString();
                 const proxyRedirectUrl = absoluteRedirectUrl.replace(/^https?:\/\//, '/');
                 console.log(`Redirecting to: ${proxyRedirectUrl}`);
                 res.redirect(proxyRedirectUrl);
@@ -113,7 +110,7 @@ async function proxyHandler(req, res) {
                 res.set('Content-Encoding', encoding);
             }
 
-            const baseUrl = `https://${new URL(finalUrl).host}`;
+            const baseUrl = `https://${new URL(targetUrl).host}`;
             const modifiedContent = rewriteUrls(content, baseUrl, contentType);
             res.set('Content-Type', contentType);
             res.status(response.status).send(modifiedContent);
