@@ -66,6 +66,15 @@ async function proxyHandler(req, res) {
             targetUrl = `https://${targetUrl}`;
         }
 
+        // Get the base URL of the server dynamically
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+        // Check if the target URL contains the base URL of the server
+        if (targetUrl.includes(baseUrl)) {
+            res.status(400).send({ error: 'Recursive proxy request detected' });
+            return;
+        }
+
         console.log(`Proxying request to: ${targetUrl}`);
 
         const response = await axios({
